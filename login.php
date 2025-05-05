@@ -175,26 +175,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <div class="logo-text">YKT</div>
 
     <div class="login-box">
-        <h2>User Login</h2>
+        <h2>Login</h2>
         <form action="" method="POST">
             <div class="form-group input-icon mb-3">
                 <i class="fa fa-user"></i>
-                <input type="text" class="form-control" name="username" placeholder="Username" required>
+                <input type="text" class="form-control" name="username" placeholder="Enter your username" required>
             </div>
             <div class="form-group input-icon mb-3">
                 <i class="fa fa-lock"></i>
-                <input type="password" class="form-control" name="password" placeholder="Password" required>
+                <input type="password" class="form-control" name="password" placeholder="Enter your password" required>
             </div>
             <div class="form-check d-flex justify-content-between mb-3">
                 <div>
                     <input class="form-check-input" type="checkbox" id="remember" name="remember">
-                    <label class="form-check-label" for="remember">Remember me</label>
+                    <label class="form-check-label" for="remember">Remember Me</label>
                 </div>
                 <div>
-                    <a href="#">Forgot Password?</a>
+                    <a href="#">Forgot your password?</a>
                 </div>
             </div>
-            <button type="submit" class="btn btn-dark w-100 btn-login">Login</button>
+            <button type="submit" class="btn btn-dark w-100 btn-login">Sign In</button>
+            <div class="text-center mt-3">
+                <a href="register.php">Don't have an account? Register here</a>
+            </div>
         </form>
     </div>
 </div>

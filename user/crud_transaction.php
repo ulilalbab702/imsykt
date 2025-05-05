@@ -49,11 +49,9 @@ if (isset($_POST['add'])) {
     $product_id = $_POST['product_id'];
     $type = $_POST['type'];
     $quantity = $_POST['quantity'];
-
     $date = $_POST['transaction_date'];
     $time = date("H:i:s");
     $transaction_date = $date . ' ' . $time;
-    $transaction_date = $_POST['transaction_date'];
     $warehouse_id = $_POST['warehouse_id'];
 
     $stmt = $conn->prepare("INSERT INTO ims_transaction (product_id, type, quantity, transaction_date, warehouse_id) VALUES (?, ?, ?, ?, ?)");
@@ -73,7 +71,7 @@ if (isset($_POST['edit'])) {
     $type = $_POST['type'];
     $quantity = $_POST['quantity'];
     $date = $_POST['transaction_date'];
-    $time = date("H:i:s"); // waktu saat ini
+    $time = date("H:i:s"); 
     $transaction_date = $date . ' ' . $time;
     $warehouse_id = $_POST['warehouse_id'];
 
