@@ -29,11 +29,17 @@ $result = mysqli_query($conn, "SELECT * FROM ims_transaction ORDER BY transactio
         <i class="fa fa-plus"></i> Add Transaction
     </button>
 
-    <div class="input-group input-group-sm mb-3" style="max-width:250px;">
-        <span class="input-group-text"><i class="fa fa-search"></i></span>
-        <input type="text" id="searchInput" class="form-control" placeholder="Search by product ID or type...">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div style="max-width: 250px;">
+        <div class="input-group input-group-sm">
+            <span class="input-group-text"><i class="fa fa-search"></i></span>
+            <input type="text" id="searchInput" class="form-control" placeholder="Search by product ID or type...">
+        </div>
     </div>
-
+    <a href="../export_excell.php" class="btn btn-secondary btn-sm">
+        <i class="fa fa-file-alt"></i> Report
+    </a>
+</div>
     <div class="table-responsive">
         <table class="table table-bordered align-middle">
         <thead>

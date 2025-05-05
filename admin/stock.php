@@ -47,7 +47,8 @@ $result = mysqli_query($conn, "SELECT * FROM Ims_stock ORDER BY stock_id ASC");
             </thead>
             <tbody>
                 <?php while($row = mysqli_fetch_assoc($result)): ?>
-                <tr data-id="<?= $row['stock_id'] ?>" data-product="<?= $row['product_id'] ?>" data-qty="<?= $row['quantity'] ?>" data-warehouse="<?= $row['warehouse_id'] ?>">
+                <?php $row_class = ($row['quantity'] <= 20) ? 'table-danger' : ''; ?>
+                <tr class="<?= $row_class ?>" data-id="<?= $row['stock_id'] ?>" data-product="<?= $row['product_id'] ?>" data-qty="<?= $row['quantity'] ?>" data-warehouse="<?= $row['warehouse_id'] ?>">
                     <td><?= htmlspecialchars($row['product_id']) ?></td>
                     <td><?= $row['quantity'] ?></td>
                     <td><?= htmlspecialchars($row['warehouse_id']) ?></td>
@@ -139,6 +140,5 @@ document.querySelectorAll('.deleteBtn').forEach(btn => {
   });
 });
 </script>
-
 </body>
 </html>

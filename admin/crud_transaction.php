@@ -26,7 +26,6 @@ function updateStock($conn, $product_id, $quantity, $type) {
     }
 }
 
-// Fungsi untuk mengembalikan stock jika transaksi di-edit atau dihapus
 function reverseStock($conn, $transaction_id) {
     $stmt = $conn->prepare("SELECT product_id, quantity, type FROM ims_transaction WHERE transaction_id = ?");
     $stmt->bind_param("i", $transaction_id);
@@ -54,6 +53,23 @@ if (isset($_POST['add'])) {
     $transaction_date = $date . ' ' . $time;
     $warehouse_id = $_POST['warehouse_id'];
 
+    // Cek stok cukup jika type out
+    if ($type === 'out') {
+        $check = $conn->prepare("SELECT quantity FROM ims_stock WHERE product_id = ?");
+        $check->bind_param("i", $product_id);
+        $check->execute();
+        $result = $check->get_result();
+        if ($row = $result->fetch_assoc()) {
+            if ($row['quantity'] < $quantity) {
+                echo "<script>alert('Insufficient stock for OUT transaction!'); window.location.href='transaction.php';</script>";
+                exit;
+            }
+        } else {
+            echo "<script>alert('Product is not in stock yet!'); window.location.href='transaction.php';</script>";
+            exit;
+        }
+    }
+
     $stmt = $conn->prepare("INSERT INTO ims_transaction (product_id, type, quantity, transaction_date, warehouse_id) VALUES (?, ?, ?, ?, ?)");
     $stmt->bind_param("isisi", $product_id, $type, $quantity, $transaction_date, $warehouse_id);
     $stmt->execute();
@@ -75,8 +91,23 @@ if (isset($_POST['edit'])) {
     $transaction_date = $date . ' ' . $time;
     $warehouse_id = $_POST['warehouse_id'];
 
-    // Kembalikan stok sebelumnya
     reverseStock($conn, $transaction_id);
+
+    if ($type === 'out') {
+        $check = $conn->prepare("SELECT quantity FROM ims_stock WHERE product_id = ?");
+        $check->bind_param("i", $product_id);
+        $check->execute();
+        $result = $check->get_result();
+        if ($row = $result->fetch_assoc()) {
+            if ($row['quantity'] < $quantity) {
+                echo "<script>alert('Insufficient stock for OUT transaction!'); window.location.href='transaction.php';</script>";
+                exit;
+            }
+        } else {
+            echo "<script>alert('Product is not in stock yet!'); window.location.href='transaction.php';</script>";
+            exit;
+        }
+    }
 
     // Update transaksi
     $stmt = $conn->prepare("UPDATE ims_transaction SET product_id=?, type=?, quantity=?, transaction_date=?, warehouse_id=? WHERE transaction_id=?");
