@@ -7,7 +7,23 @@ if (!isset($_SESSION['username'])) {
     exit;
 }
 
-$result = mysqli_query($conn, "SELECT * FROM ims_product ORDER BY product_id ASC");
+// $result = mysqli_query($conn, "SELECT * FROM ims_product ORDER BY product_id ASC");
+
+$sql = "SELECT 
+            p.product_id, 
+            p.name, 
+            p.description, 
+            p.supplier_id, 
+            s.name AS supplier_name,
+            p.price, 
+            p.image, 
+            p.created_at
+        FROM ims_product p
+        JOIN ims_supplier s ON p.supplier_id = s.supplier_id";
+$result = mysqli_query($conn, $sql);
+
+$suppliers = mysqli_query($conn, "SELECT supplier_id, name FROM ims_supplier ORDER BY name ASC");
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -55,7 +71,7 @@ $result = mysqli_query($conn, "SELECT * FROM ims_product ORDER BY product_id ASC
                             <td><?= htmlspecialchars($row['product_id']) ?></td>
                             <td><?= htmlspecialchars($row['name']) ?></td>
                             <td><?= htmlspecialchars($row['description']) ?></td>
-                            <td><?= $row['supplier_id'] ?></td>
+                            <td><?= $row['supplier_name'] ?></td>
                             <td>$<?= number_format($row['price'], 2) ?></td>
                             <td><?= $row['created_at'] ?></td>
                             <td>
@@ -90,7 +106,15 @@ $result = mysqli_query($conn, "SELECT * FROM ims_product ORDER BY product_id ASC
         <div class="modal-body">
           <div class="mb-3"><label>Name</label><input type="text" class="form-control" name="name" required></div>
           <div class="mb-3"><label>Description</label><textarea class="form-control" name="description"></textarea></div>
-          <div class="mb-3"><label>Supplier ID</label><input type="number" class="form-control" name="supplier_id" required></div>
+          <div class="mb-3"><label>Supplier</label>
+          <select class="form-select" name="supplier_id" required>
+            <option value="" disabled selected>Select Supplier</option>
+            <?php while ($supplier = mysqli_fetch_assoc($suppliers)): ?>
+              <option value="<?= $supplier['supplier_id'] ?>"><?= htmlspecialchars($supplier['name']) ?></option>
+            <?php endwhile; ?>
+          </select>
+            </div>
+          <!-- <div class="mb-3"><label>Supplier</label><input type="number" class="form-control" name="supplier_id" required></div> -->
           <div class="mb-3"><label>Price</label><input type="number" class="form-control" name="price" step="0.01" required></div>
           <div class="mb-3"><label>Image</label><input type="file" class="form-control" name="image" accept="image/*"></div>
         </div>
@@ -113,7 +137,7 @@ $result = mysqli_query($conn, "SELECT * FROM ims_product ORDER BY product_id ASC
         <div class="modal-body">
           <div class="mb-3"><label>Name</label><input type="text" class="form-control" name="name" id="edit-name" required></div>
           <div class="mb-3"><label>Description</label><textarea class="form-control" name="description" id="edit-description"></textarea></div>
-          <div class="mb-3"><label>Supplier ID</label><input type="number" class="form-control" name="supplier_id" id="edit-supplier" required></div>
+          <div class="mb-3"><label>Supplier</label><input type="number" class="form-control" name="supplier_id" id="edit-supplier" required></div>
           <div class="mb-3"><label>Price</label><input type="number" class="form-control" name="price" id="edit-price" step="0.01" required></div>
           <div class="mb-3"><label>Image</label><input type="file" class="form-control" name="image" accept="image/*"></div>
         </div>

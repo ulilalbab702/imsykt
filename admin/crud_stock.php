@@ -2,17 +2,49 @@
 include '../config/config.php';
 
 // Add
+// if (isset($_POST['add'])) {
+//     $product_id = $_POST['product_id'];
+//     $quantity = $_POST['quantity'];
+//     $warehouse_id = $_POST['warehouse_id'];
+
+//     $stmt = $conn->prepare("INSERT INTO ims_stock (product_id, quantity, warehouse_id) VALUES (?, ?, ?)");
+//     $stmt->bind_param("iii", $product_id, $quantity, $warehouse_id);
+//     $stmt->execute();
+//     header("Location: stock.php");
+//     exit;
+// }
+
+//Add new
 if (isset($_POST['add'])) {
     $product_id = $_POST['product_id'];
     $quantity = $_POST['quantity'];
     $warehouse_id = $_POST['warehouse_id'];
 
-    $stmt = $conn->prepare("INSERT INTO ims_stock (product_id, quantity, warehouse_id) VALUES (?, ?, ?)");
-    $stmt->bind_param("iii", $product_id, $quantity, $warehouse_id);
-    $stmt->execute();
+    // Check if the product already exists in the same warehouse
+    $check = $conn->prepare("SELECT stock_id, quantity FROM ims_stock WHERE product_id = ? AND warehouse_id = ?");
+    $check->bind_param("ii", $product_id, $warehouse_id);
+    $check->execute();
+    $result = $check->get_result();
+
+    if ($result->num_rows > 0) {
+        // Update quantity
+        $row = $result->fetch_assoc();
+        $new_quantity = $row['quantity'] + $quantity;
+
+        $update = $conn->prepare("UPDATE ims_stock SET quantity = ? WHERE stock_id = ?");
+        $update->bind_param("ii", $new_quantity, $row['stock_id']);
+        $update->execute();
+    } else {
+        // Insert new row
+        $insert = $conn->prepare("INSERT INTO ims_stock (product_id, quantity, warehouse_id) VALUES (?, ?, ?)");
+        $insert->bind_param("iii", $product_id, $quantity, $warehouse_id);
+        $insert->execute();
+    }
+
     header("Location: stock.php");
     exit;
 }
+
 
 // Edit
 if (isset($_POST['edit'])) {

@@ -7,7 +7,26 @@ if (!isset($_SESSION['username'])) {
     exit;
 }
 
-$result = mysqli_query($conn, "SELECT * FROM Ims_stock ORDER BY stock_id ASC");
+
+$sql = "SELECT 
+            s.stock_id,
+            s.product_id,
+            p.name AS product_name,
+            s.quantity,
+            s.warehouse_id,
+            w.name AS warehouse_name
+        FROM ims_stock s
+        JOIN ims_product p ON s.product_id = p.product_id
+        JOIN ims_warehouse w ON s.warehouse_id = w.warehouse_id";
+$result = mysqli_query($conn, $sql);
+
+// Fetch products
+$product_result = mysqli_query($conn, "SELECT product_id, name FROM ims_product ORDER BY name ASC");
+
+// Fetch warehouses
+$warehouse_result = mysqli_query($conn, "SELECT warehouse_id, name FROM ims_warehouse ORDER BY name ASC");
+
+// $result = mysqli_query($conn, "SELECT * FROM Ims_stock ORDER BY stock_id ASC");
 ?>
 
 <!DOCTYPE html>
@@ -39,9 +58,10 @@ $result = mysqli_query($conn, "SELECT * FROM Ims_stock ORDER BY stock_id ASC");
         <table class="table table-bordered align-middle" id="stockTable">
             <thead>
                 <tr>
-                    <th>Product ID</th>
+                    <th>Product</th>
                     <th>Quantity</th>
-                    <th>Warehouse ID</th>
+                    <th>Warehouse</th>
+                    <th>Safety Stock</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -49,9 +69,10 @@ $result = mysqli_query($conn, "SELECT * FROM Ims_stock ORDER BY stock_id ASC");
                 <?php while($row = mysqli_fetch_assoc($result)): ?>
                 <?php $row_class = ($row['quantity'] <= 20) ? 'table-danger' : ''; ?>
                 <tr class="<?= $row_class ?>" data-id="<?= $row['stock_id'] ?>" data-product="<?= $row['product_id'] ?>" data-qty="<?= $row['quantity'] ?>" data-warehouse="<?= $row['warehouse_id'] ?>">
-                    <td><?= htmlspecialchars($row['product_id']) ?></td>
+                    <td><?= htmlspecialchars($row['product_name']) ?></td>
                     <td><?= $row['quantity'] ?></td>
-                    <td><?= htmlspecialchars($row['warehouse_id']) ?></td>
+                    <td><?= htmlspecialchars($row['warehouse_name']) ?></td>
+                    <td>20</td>
                     <td>
                         <a href="#" class="text-warning editBtn" data-bs-toggle="modal" data-bs-target="#editModal"><i class="fa fa-pen"></i></a>
                         <a href="#" class="text-danger deleteBtn" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"><i class="fa fa-trash"></i></a>
@@ -70,9 +91,27 @@ $result = mysqli_query($conn, "SELECT * FROM Ims_stock ORDER BY stock_id ASC");
       <div class="modal-content">
         <div class="modal-header"><h5 class="modal-title">Add Stock</h5></div>
         <div class="modal-body">
-          <div class="mb-3"><label>Product ID</label><input type="number" class="form-control" name="product_id" required></div>
+        <div class="mb-3">
+          <label>Product</label>
+          <select name="product_id" class="form-select" required>
+            <option value="" disabled selected>Select Product</option>
+            <?php while ($product = mysqli_fetch_assoc($product_result)): ?>
+              <option value="<?= $product['product_id'] ?>"><?= htmlspecialchars($product['name']) ?></option>
+            <?php endwhile; ?>
+          </select>
+        </div>
+          <!-- <div class="mb-3"><label>Product ID</label><input type="number" class="form-control" name="product_id" required></div> -->
           <div class="mb-3"><label>Quantity</label><input type="number" class="form-control" name="quantity" required></div>
-          <div class="mb-3"><label>Warehouse ID</label><input type="number" class="form-control" name="warehouse_id" required></div>
+          <!-- <div class="mb-3"><label>Warehouse ID</label><input type="number" class="form-control" name="warehouse_id" required></div> -->
+          <div class="mb-3">
+          <label>Warehouse</label>
+          <select name="warehouse_id" class="form-select" required>
+            <option value="" disabled selected>Select Warehouse</option>
+            <?php while ($warehouse = mysqli_fetch_assoc($warehouse_result)): ?>
+              <option value="<?= $warehouse['warehouse_id'] ?>"><?= htmlspecialchars($warehouse['name']) ?></option>
+            <?php endwhile; ?>
+          </select>
+        </div>
         </div>
         <div class="modal-footer">
           <button type="submit" name="add" class="btn btn-success">Add</button>
@@ -91,7 +130,7 @@ $result = mysqli_query($conn, "SELECT * FROM Ims_stock ORDER BY stock_id ASC");
       <div class="modal-content">
         <div class="modal-header"><h5 class="modal-title">Edit Stock</h5></div>
         <div class="modal-body">
-          <div class="mb-3"><label>Product ID</label><input type="number" class="form-control" name="product_id" id="edit-product" required></div>
+        <div class="mb-3"><label>Product ID</label><input type="number" class="form-control" name="product_id" id="edit-product" required></div>
           <div class="mb-3"><label>Quantity</label><input type="number" class="form-control" name="quantity" id="edit-qty" required></div>
           <div class="mb-3"><label>Warehouse ID</label><input type="number" class="form-control" name="warehouse_id" id="edit-warehouse" required></div>
         </div>
